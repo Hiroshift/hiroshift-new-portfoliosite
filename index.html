@@ -135,13 +135,32 @@ html.reduce .rv{opacity:1;transform:none;transition:none}
 /* about (paper) */
 .paper{background:var(--paper);color:var(--ink)}
 .paper .head .no,.paper .head h2 small{color:#6b6a66}
-.about{display:grid;grid-template-columns:1.25fr .75fr;gap:clamp(32px,6vw,120px);align-items:start}
-@media (max-width:900px){.about{grid-template-columns:1fr}}
+.about{display:grid;grid-template-columns:1.1fr .9fr;gap:clamp(32px,6vw,120px);align-items:start}
+.about-r .tl{margin-top:0}
+@media (max-width:900px){.about{grid-template-columns:1fr;gap:0}.about-r{margin-top:clamp(40px,5vw,72px)}}
+/* 年表＝時間を動かせる。大きな数字が「いま見ている年」、各行の下の線は始めた年から今へ伸びる */
+.tlx{position:relative;margin-bottom:34px;cursor:ew-resize;touch-action:pan-y;-webkit-user-select:none;user-select:none}
+.tlx .now{font-family:'Roboto Flex','Inter Tight',sans-serif;font-size:clamp(72px,8vw,136px);line-height:.86;letter-spacing:-.045em;font-weight:900;font-variant-numeric:tabular-nums;font-variation-settings:'wght' var(--w,820),'wdth' var(--d,100),'opsz' 144}
+.tlx .rule{position:relative;height:24px;margin-top:20px;outline:none}
+.tlx .rule:focus-visible{outline:2px solid var(--sig);outline-offset:6px}
+.tlx .rule:before{content:"";position:absolute;left:0;right:0;bottom:5px;height:1px;background:rgba(10,10,11,.3)}
+.tlx .tk{position:absolute;bottom:5px;width:1px;height:5px;background:rgba(10,10,11,.3)}
+.tlx .tk.mj{height:12px;background:var(--ink)}
+.tlx .lb{position:absolute;top:100%;margin-top:6px;font-family:var(--mono);font-size:10px;letter-spacing:.14em;color:#6b6a66}
+.tlx .lb.r{transform:translateX(-100%)}
+.tlx .ph{position:absolute;top:-2px;bottom:0;width:2px;margin-left:-1px;background:var(--sig)}
+.tlx .ph:before{content:"";position:absolute;left:50%;top:-5px;width:10px;height:10px;border-radius:50%;background:var(--sig);transform:translateX(-50%)}
+.tl.live li{transition:opacity .5s var(--ease)}
+.tl.live li:not(.on){opacity:.26}
+.tl .ln{grid-column:1/-1;position:relative;height:3px;margin-top:14px;background:var(--line-d)}
+.tl .ln .bar{position:absolute;top:0;bottom:0;background:var(--ink)}
+.tl .ln .hd{position:absolute;top:-5px;width:2px;height:13px;margin-left:-1px;background:var(--sig)}
+.tl .ln .ev{position:absolute;top:50%;width:11px;height:11px;margin:-5.5px 0 0 -5.5px;border-radius:50%;background:var(--sig);transform:scale(0);transition:transform .5s var(--ease)}
+.tl li.on .ln .ev{transform:scale(1)}
+.tl .ln .ev:after{content:"";position:absolute;inset:-1px;border-radius:50%;border:1px solid var(--sig);opacity:0}
+.tl li.on .ln .ev:after{animation:evring 1.4s var(--ease) .1s 1}
+@keyframes evring{from{transform:scale(1);opacity:.9}to{transform:scale(3.4);opacity:0}}
 .stmt{font-family:var(--jp);font-size:clamp(24px,3.4vw,52px);font-weight:700;line-height:1.35;letter-spacing:-.01em}
-.portrait{position:relative;aspect-ratio:4/5;overflow:hidden;border-radius:4px;background:var(--paper-2)}
-.portrait .mark{position:absolute;inset:0;display:grid;place-items:center;font-family:var(--disp);font-weight:900;font-size:clamp(200px,28vw,420px);line-height:1;letter-spacing:-.08em;color:var(--ink);transform:translateY(-4%)}
-.portrait:after{content:"";position:absolute;inset:0;background:linear-gradient(160deg,rgba(255,74,28,.18),transparent 55%);mix-blend-mode:multiply;pointer-events:none}
-.portrait .cap{position:absolute;left:16px;bottom:14px;font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink);opacity:.7}
 .name{margin-top:clamp(40px,5vw,72px);padding-top:28px;border-top:1px solid var(--line-d)}
 .name .k{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#6b6a66}
 .name dl{display:grid;gap:0;margin-top:14px}
@@ -305,6 +324,8 @@ html.reduce *{animation:none!important;transition:none!important}
           </dl>
           <p class="core">夢中でいられる自分を守るために、変わる。</p>
         </div>
+      </div>
+      <div class="about-r">
         <ul class="tl rv">
           <li><span class="y">1996</span><div><b>音楽</b><p>新人発掘オーディションでグランプリ。翌年からビクターエンタテインメントに所属し、メジャーデビュー。全国ツアーとラジオのパーソナリティ。</p></div></li>
           <li><span class="y">2003</span><div><b>製造業の現場</b><p>受注・見積・段取り・納期。年間800件規模の案件の進行を統括。</p></div></li>
@@ -314,7 +335,6 @@ html.reduce *{animation:none!important;transition:none!important}
         </ul>
         <div class="skills rv"><span>Claude Code</span><span>Codex</span><span>Gemini</span><span>Dify</span><span>Python</span><span>JavaScript</span><span>Ruby on Rails</span><span>GAS</span><span>WebGL</span><span>Figma</span><span>Firebase</span><span>MySQL / PostgreSQL</span><span>AWS</span></div>
       </div>
-      <div class="portrait rv" aria-hidden="true"><span class="mark">≈</span><span class="cap">Hiroshift≈ — Tokyo</span></div>
     </div>
   </div>
 </section>
@@ -389,6 +409,48 @@ new ResizeObserver(syncHeroBoundary).observe(cursorHero);syncHeroBoundary();
 /* reveal */
 const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}}),{threshold:.08});
 $$('.rv').forEach(el=>io.observe(el));
+
+/* 年表＝時間を動かせる。スクロールで最初の年から今年まで進み、行が順に点く。上の数字と目盛りはなぞると行き来できる（キーボードは←→） */
+(()=>{const tl=$('.about-r .tl');if(!tl)return;const rows=$$('li',tl);if(!rows.length)return;
+ const ys=rows.map(li=>parseInt(li.querySelector('.y').textContent,10));
+ const Y0=ys[0],Y1=Math.max(new Date().getFullYear(),ys[ys.length-1]),SPAN=Math.max(1,Y1-Y0),X=y=>(y-Y0)/SPAN*100;
+ const head=document.createElement('div');head.className='tlx';
+ head.innerHTML='<div class="now" aria-hidden="true"></div><div class="rule" role="slider" tabindex="0" aria-label="年表の年" aria-valuemin="'+Y0+'" aria-valuemax="'+Y1+'"><span class="ph"></span></div>';
+ tl.before(head);const nowEl=$('.now',head),rule=$('.rule',head),ph=$('.ph',head);
+ for(let y=Y0;y<=Y1;y++){const t=document.createElement('span');t.className='tk'+(ys.includes(y)?' mj':'');t.style.left=X(y)+'%';rule.prepend(t);}
+ [[Y0,''],[Y1,' r']].forEach(([y,c])=>{const l=document.createElement('span');l.className='lb'+c;l.style.left=X(y)+'%';l.textContent=y;rule.append(l);});
+ // 最後の行は「出来事」＝点で置く。ほかは始めた年から今へ伸びる線
+ const lanes=rows.map((li,i)=>{const ev=i===rows.length-1,ln=document.createElement('span');ln.className='ln';ln.setAttribute('aria-hidden','true');
+  ln.innerHTML=(ev?'<span class="ev"></span>':'<span class="bar"></span>')+'<span class="hd"></span>';li.append(ln);
+  ln.firstChild.style.left=X(ys[i])+'%';return{bar:ev?null:ln.firstChild,hd:ln.lastChild};});
+ tl.classList.add('live');
+ let cur=Y1,target=Y1,manual=null,vel=0,shown=-1,raf=0,last=0,vis=false;
+ const render=()=>{const x=X(cur);ph.style.left=x+'%';
+  lanes.forEach((l,i)=>{if(l.bar)l.bar.style.width=Math.max(0,x-X(ys[i]))+'%';l.hd.style.left=x+'%';rows[i].classList.toggle('on',cur>=ys[i]-.02);});
+  const y=Math.min(Y1,Math.floor(cur+1e-6));if(y!==shown){shown=y;nowEl.textContent=y;rule.setAttribute('aria-valuenow',y);}
+  const s=Math.min(1,Math.abs(vel)/22);nowEl.style.setProperty('--d',(100+s*45).toFixed(1));nowEl.style.setProperty('--w',(820+s*180).toFixed(0));};
+ // 読む位置（画面の下から2割）を行の頭が越えたら、その行の年。行と行のあいだは年を数えて進む
+ const fromScroll=()=>{const L=innerHeight*.8,tops=rows.map(li=>li.getBoundingClientRect().top);if(L<=tops[0])return Y0;
+  for(let i=0;i<rows.length-1;i++)if(L<tops[i+1])return ys[i]+(ys[i+1]-ys[i])*(L-tops[i])/(tops[i+1]-tops[i]);
+  const r=rows[rows.length-1].getBoundingClientRect();return Math.min(Y1,ys[ys.length-1]+(Y1-ys[ys.length-1])*Math.max(0,(L-r.top)/r.height));};
+ const fromX=cx=>{const r=rule.getBoundingClientRect();return Y0+SPAN*Math.max(0,Math.min(1,(cx-r.left)/r.width));};
+ const frame=now=>{const dt=last?Math.min((now-last)/1000,.1):0;last=now;const prev=cur;cur+=(target-cur)*(1-Math.exp(-dt*6));vel=dt?(cur-prev)/dt:0;
+  if(Math.abs(target-cur)<.002&&Math.abs(vel)<.05){cur=target;vel=0;render();raf=0;last=0;return;}
+  render();raf=vis?requestAnimationFrame(frame):0;if(!raf)last=0;};
+ const aim=()=>{target=manual!=null?manual:fromScroll();if(reduce){cur=target;render();}else if(!raf&&vis)raf=requestAnimationFrame(frame);};
+ addEventListener('scroll',aim,{passive:true});addEventListener('resize',aim,{passive:true});
+ // なぞる：PC＝数字と目盛りの上にポインタを置く／スマホ＝そこを横になぞる
+ head.addEventListener('pointerdown',e=>{if(e.pointerType==='touch'){head.setPointerCapture(e.pointerId);manual=fromX(e.clientX);aim();}});
+ head.addEventListener('pointermove',e=>{if(e.pointerType==='touch'&&!head.hasPointerCapture(e.pointerId))return;manual=fromX(e.clientX);aim();});
+ const release=()=>{manual=null;aim();};
+ head.addEventListener('pointerleave',e=>{if(e.pointerType!=='touch')release();});
+ head.addEventListener('pointerup',e=>{if(e.pointerType==='touch')release();});head.addEventListener('pointercancel',release);
+ rule.addEventListener('keydown',e=>{const d={ArrowLeft:-1,ArrowDown:-1,ArrowRight:1,ArrowUp:1}[e.key];
+  if(e.key==='Home')manual=Y0;else if(e.key==='End')manual=Y1;else if(d)manual=Math.max(Y0,Math.min(Y1,Math.round(manual??cur)+d));else return;e.preventDefault();aim();});
+ rule.addEventListener('blur',release);
+ new IntersectionObserver(es=>{vis=es[0].isIntersecting;if(vis)aim();}).observe(tl.parentElement);
+ cur=target=fromScroll();render();
+})();
 
 
 
