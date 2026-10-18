@@ -371,6 +371,42 @@ const Q={'掲載期間（BGM）':'Webなどへの掲載は、期間限定です�
 function lastQ(reply){ return String(reply||'').split(/(?<=[。？?])/).filter(x=>/[？?]|ください|でしょうか|ますか/.test(x)).join('').trim(); }
 const KW=[['会社紹介','企業紹介','会社案内','コーポレート'],['採用','リクルート'],['展示会','ブース'],['製品','新製品','商品'],['SNS','広告','Instagram','TikTok'],['研修','マニュアル','教育'],['周年','記念','創立'],['イベント','セミナー','式典'],['CM']];
 
+// 納期の言葉から、今日から何日あるかを数える（読めなければ null）
+function noukiDays(t,now){
+  if(!t) return null;
+  t=t.replace(/[０-９]/g,c=>String.fromCharCode(c.charCodeAt(0)-65248));
+  if(/至急|急ぎ|今週/.test(t)) return 7;
+  const days=d=>Math.round((d-now)/864e5);
+  let m;
+  if(m=t.match(/(\d{1,2})月(\d{1,2})日/)){ const d=new Date(now.getFullYear(),+m[1]-1,+m[2]); if(d<now) d.setFullYear(d.getFullYear()+1); return days(d); }
+  if(m=t.match(/(\d+)\s*週間/)) return +m[1]*7;
+  if(m=t.match(/(\d+)\s*[かヶケカ]月/)) return +m[1]*30;
+  if(m=t.match(/(再来月|来月|今月|(\d{1,2})月)(上旬|初旬|初め|頭|中旬|下旬|末)?/)){
+    let y=now.getFullYear(), mo;
+    if(m[1]==='今月') mo=now.getMonth(); else if(m[1]==='来月') mo=now.getMonth()+1; else if(m[1]==='再来月') mo=now.getMonth()+2; else { mo=+m[2]-1; if(mo<now.getMonth()) y++; }
+    return days(new Date(y,mo,{上旬:5,初旬:5,初め:5,頭:5,中旬:15,下旬:25,末:28}[m[3]]||15));
+  }
+  if(/年内/.test(t)) return days(new Date(now.getFullYear(),11,28));
+  return null;
+}
+// AIが抜き出したお客様の言葉（sheet）から、金額に効く条件を決まった規則で決め直す。同じ問い合わせなら毎回同じ条件＝同じ金額になる
+function fixFlags(f,sheet){
+  if(!sheet) return;
+  const say=k=>{ const x=sheet[k]||{}; return ((x.quote||'')+' '+(x.value||'')).replace(/[０-９]/g,c=>String.fromCharCode(c.charCodeAt(0)-65248)).trim(); };
+  // 納期：今日から1か月を切れば特急
+  const nk=sheet.nouki||{}, now=new Date(); now.setHours(0,0,0,0);
+  let d=noukiDays(nk.quote,now); if(d===null) d=noukiDays(nk.value,now);
+  if(d!==null) f.tokkyu=d<31?'ari':'nashi'; else if(!say('nouki')) f.tokkyu='mikakunin';
+  // 尺：いくつか挙がったら長いほう
+  const s=say('shaku'), secs=[];
+  s.replace(/(\d+(?:\.\d+)?)\s*秒/g,(_,n)=>secs.push(+n)); s.replace(/(\d+(?:\.\d+)?)\s*分/g,(_,n)=>secs.push(Math.round(+n*60)));
+  if(secs.length) f.shaku_sec=Math.max(...secs);
+  // 掲載期間：BGMの形が変わる
+  const k=say('kikan');
+  if(/期限なし|無期限|ずっと|恒久|期限は(?:設けない|ない|特に)/.test(k)) f.bgm='mukigen';
+  else if(/\d+\s*[かヶケカ]月|\d+\s*年|\d+\s*週|期間限定|期間だけ|期間中|キャンペーン|まで/.test(k)) f.bgm='kigen';
+  else if(!k) f.bgm='mikakunin';
+}
 async function run(){
   const m=ITEMS[sel]; const st=$('st'); $('play').disabled=true; st.className='st';
   const t0=Date.now();
@@ -383,9 +419,10 @@ async function run(){
     if(m.asked&&m.lastAsk) text+='\n滝川：'+m.lastAsk+(rep?'\nお客様：'+mask(rep):'');
     text+='\n\n【進行】これはお客様から届いた問い合わせのメール'+(rep?'と、こちらの質問への返事':'')+'です。書いてあること・書いてあることから明らかなこと（工場の様子を見せる＝実写、など）は聞き返さないでください。書かれていない中で、金額にいちばん効く一点だけを短く聞いてください。';
     st.textContent='AIが問い合わせを読んでいます…';
-    try{ const r=await relay(text); m.flags=Object.assign({},r.flags||{}); m.aiq=lastQ(r.reply); m.viaAI=true; }
+    try{ const r=await relay(text); m.flags=Object.assign({},r.flags||{}); m.sheet=r.sheet; m.aiq=lastQ(r.reply); m.viaAI=true; }
     catch(e){ m.flags=Object.assign({},m.fb); m.aiq=''; m.viaAI=false; st.className='st err'; st.textContent='AIに届かなかったので、見本の読み取りで表示しています（'+e.message+'）'; }
   }
+  if(m.viaAI) fixFlags(m.flags,m.kind==='form'?(m.res&&m.res.sheet):m.sheet);
   if(!DB){ st.textContent='過去の見積の準備を待っています…'; await DBP; }
   const txt=(m.kind==='form'?m.thread:m.body+' '+(m.reply||''));
   m.flags.kw=[].concat(...KW.filter(g=>g.some(k=>txt.includes(k))));
