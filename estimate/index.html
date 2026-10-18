@@ -462,7 +462,7 @@ function render(m){
     '<div class="trk"><div class="lb">A1<br><small style="font-size:9.5px;color:var(--ink-3);font-weight:500">音</small></div><div class="lane">'+(aRows.length?aRows.map(clip).join(''):'<div class="clip none" style="flex:1">音（ナレーション・MA・BGM）は未確認</div>')+'</div></div></div>'+
     '<div class="ev" id="ev"></div>'+
     (nones.length?'<div class="calc">金額に入れていないもの：'+nones.map(x=>esc(x.name)+'（'+esc(x.why)+'）').join('／')+'</div>':'')+
-    '<div class="calc">金額はAIではなく決まった計算です。過去に受注した'+e.pool+'件（freee以前のExcelも含む）から条件の似た'+e.sim.length+'件を数え、費目ごとに真ん中の半分（下から25〜75%）の幅を出しています。同じ条件なら毎回同じ金額です。'+(e.notes.length?esc(e.notes.join('。'))+'。':'')+'</div></div></div>';
+    '<div class="calc">金額はAIではなく決まった計算です。過去に受注した'+e.pool+'件（freee以前のExcelも含む）から条件の似た'+e.sim.length+'件を数え、費目ごとに真ん中の半分（下から25〜75%）の幅を出しています。同じ条件なら毎回同じ金額です。'+(e.notes.length?esc(e.notes.join('。'))+'。':'')+'<br><b>概算は過去の見積から数えた目安で、見積の確定ではありません。AIの読み取りは間違えることがあります。条件と金額は人が確かめてください。</b></div></div></div>';
   const lines=rows.map(x=>({type:'item',description:x.name,quantity:1,unit:'式',unit_price:String(x.mid),tax_rate:10}));
   const sum=rows.reduce((t,x)=>t+x.mid,0), tax=Math.floor(sum*0.1);
   const body={company_id:'（貴社のfreee事業所ID）',quotation_date:'（今日）',subject:m.sub.slice(0,30)+' 概算見積',partner_id:'（取引先）',partner_title:'御中',tax_entry_method:'out',tax_fraction:'omit',withholding_tax_entry_method:'out',lines};
